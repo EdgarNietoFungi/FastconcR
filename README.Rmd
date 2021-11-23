@@ -1,0 +1,125 @@
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+  html_notebook: default
+---
+
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+library(easydose)
+#knitr::opts_chunk$set(echo = TRUE)
+#knitr::opts_chunk$set(include = FALSE)
+#knitr::opts_knit$set(root.dir = '../')
+```
+## About 
+
+FastconcR is a program to get an fast and easy discriminatory concnetrations for fungi based on serial dilution.
+
+The FastconcR project was developed by Edgar Nieto and Sydney Everhart. A paper with more details about the program is available from
+
+- [XX] -XXX
+
+##License
+GPL-3
+# Loading packages
+```{r, results="hide", warning=FALSE}
+using("tidyverse", "ezec", "broom")
+
+```
+#Reading serial dilution data which has 4 repeats
+```{r Reading serial dilution, results="hide"}
+data.serial.dilution <-
+  reading_data_serial_dilution("example_serial_dilution_entry.csv",length_repeats = 4,plug = 0.6) 
+data.serial.dilution 
+```
+# getting EC50 of serial dilution
+```{r getting EC50 serial dilution,  results="hide",  fig.show = "hide", warning=FALSE}
+hola <- getting_EC50(data.serial.dilution)
+hola
+
+```
+# Getting RG of serial dilution
+```{r Getting RG  serial dilution, results="hide", fig.show = "hide", warning=FALSE}
+data.RG <- getting_RG(data.serial.dilution)
+data.RG
+```
+#Getting the potential Discriminatory concentration
+```{r setting the potential DC, results="hide"}
+DC_2(data.RG)
+```
+#Testing the potential gotten Discriminatory concentration
+```{r Testing the potential  DC, results="hide"}
+test.DC <- lineal_model_1(data.RG, "logEC50","RG",desiredR2 = 0.75)
+#if it release results it means it has good R2 the model
+test.DC
+
+### Now testing with default r2
+
+test.DC.2 <- lineal_model_1(data.RG, "logEC50","RG")
+test.DC.2
+```
+# Graph of the linear model between LogEC50 and Relative growth
+```{r Graph of the linear model 1}
+myplot_model_1(data.RG)
+# Graph of the linear model between LogEC50 and Relative growth included the model and R2 and p value: it depends of the values it might look weird, so it must be modified the function if so
+
+myplot_model_1_label(data.RG)
+
+```
+
+# It tells you if the Estimate.50DC is good or not based on the R2 of the  linear regression between Estimate.50DC and the EC50 
+```{r, echo=TRUE,results="hide"}
+test.2.DC <- lineal_model_2( test.DC, "Estimate.50DC","EC50", desiredR2 = 0.70)
+test.2.DC
+### Now testing with default r2
+
+test.2.DC.2 <- lineal_model_2( test.DC, "Estimate.50DC","EC50")
+test.2.DC.2
+```
+# Plotting model 2
+```{r Graph of the linear model 2, echo=TRUE}
+myplot_model_2(test.DC)
+# plotting model 2 included the model and R2 and p value: it depends of the values it might look weird, so it must be modified the function if so
+myplot_model_2_label (test.DC)
+```
+#n the following  example the data has 3 repeats per ID
+#Reading the data using the discriminatory concentrations of the survey 
+
+```{r Reading data using DC, results="hide", warning=FALSE}
+
+data.dis.concentration <- reading_data_discriminatory_concentration("example_discriminatory_concentration_entry.csv", length_repeats = 3, plug = 0.6)
+data.dis.concentration
+
+#Getting the Estimate EC50DC  of the survey 
+
+dis.concentration<- getting_EC50D_survey(data.RG, data.dis.concentration, "logEC50","RG")
+dis.concentration
+
+#If you have some defined  by groups if you may have
+
+Farmer.fields.isolates <- c(136:442, 455, 456, 466, 468, 470, 471, 478:554, 602:610, 612:635, 671, 672, 682:690, 695:797, 810:823, 834, 835, 848:1024, 1255: 1326, 1491: 1500, 1661:1670, 1831: 2246, 2303: 2342,2362: 2381, 2393: 2573)
+
+baseline.isolates <- c(1: 136, 444: 454, 457: 465, 467, 469, 472:477, 555:601, 611, 636:670, 673: 680, 691:694 , 798: 809,  824: 833, 836: 847)
+
+
+#Overwriting and adding the groups
+dis.concentration.by.groups <- add_groups(filename = dis.concentration, group1 =  baseline.isolates, group2 =  Farmer.fields.isolates)
+
+
+
+```
+```{r myplot comparison}
+myplot_comparison_s(dis.concentration.by.groups)
+```
+
+
+

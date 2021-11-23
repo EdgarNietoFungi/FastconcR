@@ -1,0 +1,36 @@
+---
+title: "R Notebook"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = '../')
+```
+## About 
+
+FastconcR is a program to get an fast and easy discriminatory concnetrations for fungi based on serial dilution.
+
+The FastconcR project was developed by Edgar Nieto and Sydney Everhart. A paper with more details about the program is available from
+
+- [XX] -XXX
+
+##License
+
+# Loading packages
+```{r loading packages}
+using("tidyverse", "ezec", "broom")
+```
+#Reading serial dilution data which has 4 repeats
+```{r Reading serial dilution}
+data.serial.dilution <-
+  reading_data_serial_dilution("example_1.csv",length_repeats = 4,plug = 0.6) 
+data.serial.dilution 
+```
+##  getting EC50 of serial dilution
+```{r}
+hola <- getting_EC50(data.serial.dilution)
+hola
+```
